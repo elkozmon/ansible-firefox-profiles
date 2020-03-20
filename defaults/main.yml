@@ -1,0 +1,21 @@
+---
+# defaults file for roles/firefox
+
+# By default, assume that 'firefox' is in $PATH.
+firefox_cmd: firefox
+
+# Root of Firefox configuration
+firefox_dir: "{{ ansible_env.HOME }}/.mozilla/firefox"
+
+# XXX - Not implemented yet
+# profile_state can be 'present' (create the profile if it doesn't exist)
+# or 'absent' (delete the profile if it exists)
+# profile_state: present
+
+# Path to profiles.ini
+#firefox_profile_path: "{{ lookup('env', 'HOME')}}/.mozilla/firefox/profiles.ini"
+firefox_profile_path: "{{ firefox_dir }}/profiles.ini"
+
+# Owner and group of the Firefox directory
+firefox_owner: "{{ ansible_user_id }}"
+firefox_group: "{{ ansible_effective_group_id }}"
