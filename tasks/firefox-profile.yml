@@ -1,0 +1,105 @@
+---
+# Create a Firefox profile
+
+- name: "Create Firefox profile directory"
+  file:
+    path: "{{ firefox_dir }}"
+    state: directory
+    recurse: yes
+    owner: "{{ firefox_owner | default(ansible_user_id)}}"
+    group: "{{ firefox_group | default(ansible_effective_group_id)}}"
+#    mode: '0700'
+
+# XXX - Ought to be able to delete profiles, or rebuild them.
+# - name: "Delete profile {{ profile }}"
+#   command:
+#     - "{{ firefox_cmd }}"
+#     - "-no-remote"
+#     - "-DeleteProfile"
+#     - "{{ profile }}"
+#   register: profile_status
+#   when:
+#     - profile_state == "absent"
+
+# XXX - It would be nice to do this some way other than grep, for
+# portability to non-Unix OSes (*cough*Windows*cough*), but I don't
+# know of one.
+- name: "Get profile directory"
+  block:
+    - name: Look for an existing subdirectory
+      find:
+        paths:
+          - "{{ firefox_dir }}"
+          - "{{ firefox_dir }}/Profiles"	# MacOS
+        patterns: "*.{{ profile }}"
+        file_type: directory
+        recurse: no
+      register: find_profiles
+      failed_when: no
+      changed_when: find_profiles.matched != 1
+
+- name: "Create profile {{ profile }}"
+  block:
+    - name: "Tell Firefox to create profile {{ profile }}"
+      command:
+        argv:
+          - "{{ firefox_cmd }}"
+          - "-no-remote"
+          - "-CreateProfile"
+          - "{{ profile }}"
+      when: find_profiles is changed
+      register: profile_status
+    - name: "Get profile.ini entry"
+      command:
+        argv:
+          - grep
+          - '^Path=.*\.{{ profile }}$'
+          - "{{ firefox_profile_path }}"
+      register: profile_grep
+      check_mode: no
+      changed_when: no
+      failed_when: no
+    - name: "Check that profile was created correctly"
+      vars:
+        lines: "{{ profile_grep.stdout_lines | default(['dummy']) }}"
+        path: >-
+          {{
+              lines[0] | default("") |
+                regex_replace('^Path=', '')
+          }}
+      file:
+        path: "{{ path }}"
+        state: directory
+      check_mode: yes
+      register: profile_dir_stat
+      changed_when: no
+      failed_when:
+        - not ansible_check_mode
+        - profile_dir_stat is changed
+    - name: "Get profile subdirectory"
+      vars:
+        lines: "{{ profile_grep.stdout_lines + [ 'dummy' ] }}"
+      set_fact:
+        profile_dir: >-
+          {{
+            lines[0] |
+            regex_replace('^Path=', '')
+          }}
+
+# Install addons (and themes)
+- name: Install addons
+  include_tasks: firefox-addon.yml
+  with_items: "{{ addons }}"
+  loop_control:
+    loop_var: addon_slug
+
+- name: Tweak preferences
+  lineinfile:
+    path: "{{ firefox_dir }}/{{ profile_dir }}/prefs.js"
+    regexp: '^user_pref\(\"{{ item }}\",.*'
+    line: 'user_pref("{{ item }}", {{ prefs[item] }});'
+    create: yes
+    owner: "{{ firefox_owner | default(ansible_user_id)}}"
+    group: "{{ firefox_group | default(ansible_effective_group_id)}}"
+#    mode: '0600'
+  with_items: "{{ prefs }}"

@@ -1,0 +1,50 @@
+---
+# Parameters:
+# - addon_slug: "slug" for the addon to install, e.g., "adblock-plus".
+
+# See also
+# https://stackoverflow.com/questions/37728865/install-webextensions-on-firefox-from-the-command-line
+#	slug=adblock-plus
+# - Get information about the add-on:
+#   https://services.addons.mozilla.org/api/v4/addons/addon/${slug}/
+
+- name: "addon {{ addon_slug }}: Look up information"
+  vars:
+    info_base: "https://services.addons.mozilla.org/api/v4/addons/addon/"
+  uri:
+    url: "{{ info_base }}/{{ addon_slug }}/"
+    return_content: yes
+    body_format: json
+  register: addon_info
+  check_mode: no
+
+# XXX - Make sure the installation directory exists:
+# /Users/arensb/Library/Application Support/Firefox/Profiles/bwbr4efd.default-release/extensions
+# ~/.mozilla/firefox/2v2ty9bu.NCBI2/extensions/
+- name: "addon {{ addon_slug }}: Create extension directory"
+  file:
+    path: "{{ firefox_dir }}/{{ profile_dir }}/extensions"
+    state: directory
+    recurse: yes
+    owner: "{{ firefox_owner | default(ansible_user_id)}}"
+    group: "{{ firefox_group | default(ansible_effective_group_id)}}"
+    mode: '0700'
+
+# Download each file
+- name: "addon {{ addon_slug }}: download extension file"
+  vars:
+    # Extract slug
+    slug: "{{ addon_info.json | json_query('slug') }}"
+    # Extract guid
+    guid: "{{ addon_info.json | json_query('guid') }}"
+    basename: "{{ guid }}.xpi"
+  uri:
+    url: "{{ item.url }}"
+    dest: "{{ firefox_dir }}/{{ profile_dir }}/extensions/{{ basename }}"
+    creates: "{{ firefox_dir }}/{{ profile_dir }}/extensions/{{ basename }}"
+    owner: "{{ firefox_owner | default(ansible_user_id)}}"
+    group: "{{ firefox_group | default(ansible_effective_group_id)}}"
+    mode: '0600'
+  with_items: "{{ addon_info.json | json_query('current_version.files') | list }}"
+  loop_control:
+    label: "{{ slug }}"
