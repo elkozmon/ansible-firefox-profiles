@@ -1,0 +1,4 @@
+---
+# tasks file for roles/firefox
+- include_tasks: firefox-profile.yml
+- include_tasks: firefox-addon.yml
