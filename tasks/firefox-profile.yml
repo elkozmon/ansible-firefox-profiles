@@ -5,10 +5,9 @@
   file:
     path: "{{ firefox_dir }}"
     state: directory
-    recurse: yes
     owner: "{{ firefox_owner | default(ansible_user_id)}}"
     group: "{{ firefox_group | default(ansible_effective_group_id)}}"
-#    mode: '0700'
+    mode: '0755'
 
 # XXX - Ought to be able to delete profiles, or rebuild them.
 # - name: "Delete profile {{ profile }}"
