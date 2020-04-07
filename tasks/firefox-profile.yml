@@ -100,5 +100,5 @@
     create: yes
     owner: "{{ firefox_owner | default(ansible_user_id)}}"
     group: "{{ firefox_group | default(ansible_effective_group_id)}}"
-#    mode: '0600'
+    mode: '0644'
   with_items: "{{ prefs }}"
