@@ -18,17 +18,18 @@
   register: addon_info
   check_mode: no
 
-# XXX - Make sure the installation directory exists:
-# /Users/arensb/Library/Application Support/Firefox/Profiles/bwbr4efd.default-release/extensions
-# ~/.mozilla/firefox/2v2ty9bu.NCBI2/extensions/
+# Make sure the installation directory exists:
+# Linux:
+#   $HOME/.mozilla/firefox/<profile-dir>/extensions/
+# MacOS:
+#   $HOME/Library/Application Support/Firefox/Profiles/<profile-dir>/extensions
 - name: "addon {{ addon_slug }}: Create extension directory"
   file:
     path: "{{ firefox_dir }}/{{ profile_dir }}/extensions"
     state: directory
-    recurse: yes
     owner: "{{ firefox_owner | default(ansible_user_id)}}"
     group: "{{ firefox_group | default(ansible_effective_group_id)}}"
-    mode: '0700'
+    mode: '0755'
 
 # Download each file
 - name: "addon {{ addon_slug }}: download extension file"
