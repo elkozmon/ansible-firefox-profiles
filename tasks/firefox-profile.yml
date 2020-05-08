@@ -101,4 +101,8 @@
     owner: "{{ firefox_owner | default(ansible_user_id)}}"
     group: "{{ firefox_group | default(ansible_effective_group_id)}}"
     mode: '0644'
+    # If the value is "null", then remove this line altogether.
+    # Useful for cases like "network.proxy.type: 5": 5 is the default,
+    # so Firefox removes the line entirely.
+    state: "{{ 'absent' if prefs[item] == None else 'present' }}"
   with_items: "{{ prefs }}"
