@@ -1,0 +1,13 @@
+---
+# Parameters:
+# - security_device: Device to add. Has subfields:
+#   - name: Human-friendly name of the device, like "OpenSC PKCS Module"
+#   - lib: Path to the library implementing the device, e.g.,
+#	/usr/lib/libfoo.so
+
+- name: "Security device {{ security_device.name }}"
+  blockinfile:
+    path: "{{ firefox_dir }}/{{ profile_dir }}/pkcs11.txt"
+    block: |
+      name={{ security_device.name }}
+      library={{ security_device.lib }}

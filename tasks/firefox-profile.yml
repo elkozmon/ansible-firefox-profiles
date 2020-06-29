@@ -106,3 +106,10 @@
     # so Firefox removes the line entirely.
     state: "{{ 'absent' if prefs[item] == None else 'present' }}"
   with_items: "{{ prefs }}"
+
+# Install security devices
+- name: Install security devices
+  include_tasks: security-device.yaml
+  with_items: "{{ security_devices }}"
+  loop_control:
+    loop_var: security_device
