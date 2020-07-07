@@ -1,7 +1,7 @@
 ---
 # Create a Firefox profile
 
-- name: "Create Firefox profile directory"
+- name: "Profile {{ profile }}: Create Firefox profile directory"
   file:
     path: "{{ firefox_dir }}"
     state: directory
@@ -23,7 +23,7 @@
 # XXX - It would be nice to do this some way other than grep, for
 # portability to non-Unix OSes (*cough*Windows*cough*), but I don't
 # know of one.
-- name: "Get profile directory"
+- name: "Profile {{ profile }}: Get profile directory"
   block:
     - name: Look for an existing subdirectory
       find:
@@ -86,13 +86,13 @@
           }}
 
 # Install addons (and themes)
-- name: Install addons
+- name: "Profile {{ profile }}: Install addons"
   include_tasks: firefox-addon.yml
   with_items: "{{ addons }}"
   loop_control:
     loop_var: addon_slug
 
-- name: Tweak preferences
+- name: "Profile {{ profile }}: Tweak preferences"
   lineinfile:
     path: "{{ firefox_dir }}/{{ profile_dir }}/prefs.js"
     regexp: '^user_pref\(\"{{ item }}\",.*'

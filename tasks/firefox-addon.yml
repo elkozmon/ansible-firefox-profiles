@@ -8,7 +8,7 @@
 # - Get information about the add-on:
 #   https://services.addons.mozilla.org/api/v4/addons/addon/${slug}/
 
-- name: "addon {{ addon_slug }}: Look up information"
+- name: "profile {{ profile }}: addon {{ addon_slug }}: Look up information"
   vars:
     info_base: "https://services.addons.mozilla.org/api/v4/addons/addon/"
   uri:
@@ -23,7 +23,7 @@
 #   $HOME/.mozilla/firefox/<profile-dir>/extensions/
 # MacOS:
 #   $HOME/Library/Application Support/Firefox/Profiles/<profile-dir>/extensions
-- name: "addon {{ addon_slug }}: Create extension directory"
+- name: "Profile {{ profile }}: addon {{ addon_slug }}: Create extension directory"
   file:
     path: "{{ firefox_dir }}/{{ profile_dir }}/extensions"
     state: directory
@@ -32,7 +32,7 @@
     mode: '0755'
 
 # Download each file
-- name: "addon {{ addon_slug }}: download extension file"
+- name: "Profile {{ profile }}: addon {{ addon_slug }}: download extension file"
   vars:
     # Extract slug
     slug: "{{ addon_info.json | json_query('slug') }}"
