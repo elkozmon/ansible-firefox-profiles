@@ -106,6 +106,9 @@
     # so Firefox removes the line entirely.
     state: "{{ 'absent' if prefs[item] == None else 'present' }}"
   with_items: "{{ prefs }}"
+  when:
+    - prefs is defined
+    - prefs != ""
 
 # Install security devices
 - name: Install security devices
@@ -113,3 +116,7 @@
   with_items: "{{ security_devices }}"
   loop_control:
     loop_var: security_device
+  when:
+    - security_devices is defined
+    - security_devices != ""
+    - security_devices | length > 0
