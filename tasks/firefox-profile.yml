@@ -51,8 +51,8 @@
     - name: "Get profile.ini entry"
       command:
         argv:
-          - grep
-          - '^Path=.*\.{{ profile }}$'
+          - egrep
+          - '^Path=.*\.{{ profile }}(-[0-9]+)?$'
           - "{{ firefox_profile_path }}"
       register: profile_grep
       check_mode: no
