@@ -30,7 +30,8 @@
         paths:
           - "{{ firefox_dir }}"
           - "{{ firefox_dir }}/Profiles"	# MacOS
-        patterns: "*.{{ profile }}"
+        patterns: ".*\\.{{ profile }}(-[0-9]+)?$"
+        use_regex: yes
         file_type: directory
         recurse: no
       register: find_profiles
