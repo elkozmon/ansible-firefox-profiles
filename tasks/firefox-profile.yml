@@ -10,6 +10,9 @@
     mode: '0755'
 
 # XXX - Ought to be able to delete profiles, or rebuild them.
+# Unfortunately,
+# https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options
+# doesn't list a way to do this.
 # - name: "Delete profile {{ profile }}"
 #   command:
 #     - "{{ firefox_cmd }}"
