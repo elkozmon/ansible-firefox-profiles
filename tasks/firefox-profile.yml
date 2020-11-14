@@ -61,7 +61,14 @@
       failed_when: no
     - name: "Check that profile was created correctly"
       vars:
-        lines: "{{ profile_grep.stdout_lines | default(['dummy']) }}"
+        lines: >-
+          {{
+            profile_grep.stdout_lines |
+            default(
+              [ profile, 'dummy' ] if ansible_check_mode
+              else [ 'dummy' ]
+            )
+          }}
         path: >-
           {{
               lines[0] | default("") |
@@ -78,7 +85,12 @@
         - profile_dir_stat is changed
     - name: "Get profile subdirectory"
       vars:
-        lines: "{{ profile_grep.stdout_lines + [ 'dummy' ] }}"
+        lines: >-
+          {{
+            profile_grep.stdout_lines +
+            [ profile ] if ansible_check_mode else [] +
+            [ 'dummy' ]
+          }}
       set_fact:
         profile_dir: >-
           {{
