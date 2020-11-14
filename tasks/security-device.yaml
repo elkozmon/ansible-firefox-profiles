@@ -11,3 +11,4 @@
     block: |
       name={{ security_device.name }}
       library={{ security_device.lib }}
+    create: yes
