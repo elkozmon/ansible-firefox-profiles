@@ -90,7 +90,7 @@
         lines: >-
           {{
             profile_grep.stdout_lines +
-            [ profile ] if ansible_check_mode else [] +
+            ([ profile ] if ansible_check_mode else []) +
             [ 'dummy' ]
           }}
       set_fact:
