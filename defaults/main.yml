@@ -1,5 +1,8 @@
 ---
 # defaults file for roles/firefox
+addons: []
+security_devices: []
+prefs: {}
 
 # By default, assume that 'firefox' is in $PATH.
 firefox_cmd: firefox
