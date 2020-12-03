@@ -80,7 +80,6 @@
       file:
         path: "{{ path }}"
         state: directory
-      check_mode: yes
       register: profile_dir_stat
       changed_when: no
       failed_when:
