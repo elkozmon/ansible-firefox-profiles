@@ -1,0 +1,5 @@
+---
+- name: Install Mozilla CA bundle
+  become: yes
+  macports:
+    name: py-certifi
