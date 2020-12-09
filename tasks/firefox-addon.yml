@@ -10,7 +10,7 @@
 
 - name: "profile {{ profile }}: addon {{ addon_slug }}: Look up information"
   vars:
-    info_base: "https://services.addons.mozilla.org/api/v4/addons/addon/"
+    info_base: "https://services.addons.mozilla.org/api/v4/addons/addon"
   uri:
     url: "{{ info_base }}/{{ addon_slug }}/"
     return_content: yes
