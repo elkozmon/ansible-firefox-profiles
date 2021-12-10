@@ -26,6 +26,12 @@
 # XXX - It would be nice to do this some way other than grep, for
 # portability to non-Unix OSes (*cough*Windows*cough*), but I don't
 # know of one.
+
+# XXX - profile.ini has a set of sections named Profile0, Profile1, etc.
+# Iterate over these with a for-loop. In each one, Look up "Name".
+#   If Name equals {{ profile }}, save to register profile.
+# Finally, if profile register is unset, the profile doesn't exist.
+
 - name: "Profile {{ profile }}: Get profile directory"
   block:
     - name: Look for an existing subdirectory
