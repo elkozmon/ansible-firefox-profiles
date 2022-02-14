@@ -16,6 +16,7 @@
 # - name: "Delete profile {{ profile }}"
 #   command:
 #     - "{{ firefox_cmd }}"
+#     - "-headless"
 #     - "-no-remote"
 #     - "-DeleteProfile"
 #     - "{{ profile }}"
@@ -53,6 +54,7 @@
       command:
         argv:
           - "{{ firefox_cmd }}"
+          - "-headless"
           - "-no-remote"
           - "-CreateProfile"
           - "{{ profile }}"
