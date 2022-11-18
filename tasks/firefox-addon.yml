@@ -14,7 +14,7 @@
   uri:
     url: "{{ info_base }}/{{ addon_slug }}/"
     return_content: yes
-    body_format: json
+    # body_format: json
   register: addon_info
   check_mode: no
 
