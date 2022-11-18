@@ -2,6 +2,20 @@
 # Parameters:
 # - addon_slug: "slug" for the addon to install, e.g., "adblock-plus".
 
+# XXX - Require jmespath for json_query to work.
+# In macports, install 'py-jmespath'
+- name: Install jmespath (package)
+  package:
+    name: python3-jmespath
+  when:
+    - ansible_pkg_mgr == "apt"
+- name: Install jmespath (macports)
+  macports:
+    name: py-jmespath
+    state: present
+  when:
+    - ansible_system == "Darwin"
+
 # See also
 # https://stackoverflow.com/questions/37728865/install-webextensions-on-firefox-from-the-command-line
 #	slug=adblock-plus
