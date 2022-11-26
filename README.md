@@ -8,6 +8,10 @@ Requirements
 
 Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
+- `jmespath` package (for parsing json):
+  `python3-jmespath` in apt, or `py-jmespath` in Macports.
+- `py-certifi` port in Macports.
+
 Role Variables
 --------------
 
