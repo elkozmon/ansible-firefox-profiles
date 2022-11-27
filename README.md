@@ -22,6 +22,13 @@ Dependencies
 
 A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
+- jmespath package
+  In apt, install `python3-jmespath`.
+  In MacPorts, install `py-jmespath`.
+- Mozilla CA bundle
+  In apt, install `ca-certificates` (I think).
+  On MacPorts, install `py-certifi`.
+
 Example Playbook
 ----------------
 

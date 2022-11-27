@@ -1,10 +1,8 @@
 ---
-- name: Install Mozilla CA bundle
-  become: yes
-  macports:
-    name: py-certifi
-
-  # XXX - Right now, I'm running this as myself, not as ansible, but
-  # without a sudo password, so Ansible can't sudo and install these
-  # files. Comment out this play until this is resolved.
-  when: no
+# XXX - Right now, I'm running this as myself, not as ansible, but
+# without a sudo password, so Ansible can't sudo and install these
+# files. Comment out this play until this is resolved.
+# - name: Install Mozilla CA bundle
+#   become: yes
+#   macports:
+#     name: py-certifi
