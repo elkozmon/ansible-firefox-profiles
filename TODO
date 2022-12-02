@@ -1,0 +1,6 @@
+#						-*- Org -*-
+
+* TODO Default profiles.ini
+Default location of ~profiles.ini~ varies by operating system.
+- Unix/Linux: ~/.mozilla/firefox/profiles.ini
+- MacOS: ~/Library/Application Support/Firefox/profiles.ini
