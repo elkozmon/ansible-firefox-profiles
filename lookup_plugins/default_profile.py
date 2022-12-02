@@ -40,6 +40,8 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
 
+        display.debug(f"inside run(terms=[{terms}], variables={variables}")
+
         # First of all, populate options.
         # This will already take into account environment variables
         # and ini config.
