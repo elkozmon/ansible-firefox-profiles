@@ -14,9 +14,21 @@ DOCUMENTATION = """
       description: Pathname of profile.ini file to read.
       type: string
       required: False
+    option1:
+      description: Dummy option
+      type: string
+      required: False
   notes:
     - 'profile.ini' contains one section with a name of the form "[InstallXXXXXX]". This is the default.
     - This module assumes that there is only one such section
+"""
+DOCUMENTATION = """
+  name: default_profile
+  options:
+    option1:
+      description: Dummy option
+      type: string
+      required: False
 """
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.plugins.lookup import LookupBase
