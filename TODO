@@ -4,3 +4,101 @@
 Default location of ~profiles.ini~ varies by operating system.
 - Unix/Linux: ~/.mozilla/firefox/profiles.ini
 - MacOS: ~/Library/Application Support/Firefox/profiles.ini
+
+* TODO Look up profile directory
+There's a [[https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ini_lookup.html][lookup plugin for .ini files]]. Should be possible to use that to read the ~profiles.ini~ file and get the actual directory used for a given profile, and not guess it.
+
+Profiles are of the form:
+#+begin_src conf
+[Profile6]
+Name=NCBI4
+IsRelative=1
+Path=ccb0rcrm.NCBI4
+#+end_src
+
+So to look up a profile by name (here, "NCBI4"), need to find the section that contains "Name=NCBI4". If that's not possible, might need to iterate over all sections.
+
+Doesn't look as though there's a way to do this kind of search. However, the sections are of the form "Profile<n>". And apparently Firefox keeps removes gaps, so that if there are N profiles, they will be =Profile0= through =ProfileN=. So in principle, we can set up a for loop:
+
+https://docs.ansible.com/ansible/2.4/playbooks_loops.html#looping-over-integer-sequences
+
+Search =Profile0=, =Profile1=, ... =ProfileN= until the desired section doesn't exist.
+
+* Addons
+It might not be possible to install addons just by dumping an xpi file in a directory somewhere. It might be necessary to create a =policies.json= file that says to download and update certain extensions.
+
+Or maybe it /is/ possible:
+https://support.mozilla.org/en-US/kb/deploying-firefox-with-extensions
+says to dump the XPI files in a directory.
+
+So maybe it's just that unknown or unsigned extensions won't be allowed, which doesn't concern us.
+
+See
+https://extensionworkshop.com/documentation/publish/distribute-sideloading/#standard-extension-folders
+
+* Themes
+They're documented in =extensions.json=. Apparently they're considered addons just like plugins.
+
+=green-abstract= is in
+: ~/.mozilla/firefox/gbg4mnfw.carrot/extensions/{ce743293-2169-47f3-bccf-dc42e2121e0a}.xpi
+
+* DONE Bug: Bogus changes
+CLOSED: [2020-04-07 Tue 11:49]
+Why does it keep saying that something has changed, when it hasn't?
+
+Specifically, the "file:" tasks. I think that if you take out the owner/group/mode information, it stops thinking something has changed.
+
+[2020-04-07 Tue 11:49]
+Looks like there's a bug in the ~file~ module: when you have ~recurse: yes~, it seems to get confused about what permissions ought to be, and so thinks that things have changed when they haven't.
+Fix: set ~recurse: no~.
+
+* DONE Delete old Firefox role
+CLOSED: [2020-04-02 Thu 15:44]
+The one downloaded from ansible-galaxy
+
+* DONE Preferences
+CLOSED: [2020-03-25 Wed 12:15]
+Should be as simple as adding lines to =prefs.js= with =lineinfile=.
+Take a dict of key -> value pairs
+
+* DONE Remove prefs
+CLOSED: [2020-05-26 Tue 22:42]
+Have a list of lines that should be removed from ~prefs.js~.
+
+The elegant way is to have
+:    some-pref: none
+or something.
+
+The easy way is to just have a separate list of preferences that
+shouldn't be in the file.
+
+* CANCELLED Clone existing role
+CLOSED: [2021-03-26 Fri 09:35]
+Ought to be able to start by cloning an existing role, i.e., a local directory.
+
+* DONE List of domains
+CLOSED: [2020-04-02 Thu 15:44]
+Would be nice to specify a list of domains that ought to bypass proxy.
+Specify these as a YAML list.
+Concatenate them into a string before inserting into Firefox ~prefs.js~.
+
+* TODO Delete profiles
+It would be nice to delete profiles as well as create them:
+: firefox -no-remote -DeleteProfile <profile>
+
+But on MacOS, this fails when Firefox is already running.
+
+* DONE Make sure there's no PII in git
+CLOSED: [2020-04-07 Tue 11:53]
+
+* DONE Fill out the meta file
+CLOSED: [2020-10-20 Tue 21:29]
+
+** DONE Platforms
+CLOSED: [2020-10-20 Tue 21:28]
+
+** DONE tags
+CLOSED: [2020-10-20 Tue 21:28]
+* TODO Fill out README.md
+
+* TODO Upload to ansible-galaxy
