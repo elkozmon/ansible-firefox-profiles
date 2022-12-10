@@ -97,9 +97,6 @@ class LookupModule(LookupBase):
                 named in 'terms' are stored.
         """
         # Read the profiles.ini file
-        retval = [{'path': 'abcd1234.carrot'}]
-        display.vvv(f"run returning {retval}")
-        return retval
         profiles = configparser.ConfigParser()
         try:
             with open(LookupModule.default_profiles_path) as inifile:
@@ -142,7 +139,8 @@ class LookupModule(LookupBase):
                     # retval.
                     display.vvv("Found it.")
                     # profile_opts = profiles.options(section)
-                    profile_opts = {option: profiles.get(section, option) for option in profiles.options(section)}
+                    profile_opts = {option: profiles.get(section, option)
+                                    for option in profiles.options(section)}
                     retval.append(profile_opts)
                     break
 
