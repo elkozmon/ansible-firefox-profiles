@@ -1,8 +1,6 @@
 ---
 # Prerequisite packages
 - include_tasks: packages-macports.yml
-  when:
-    - ansible_pkg_mgr == "macports"
 
 # tasks file for roles/firefox
 - include_tasks: firefox-profile.yml
