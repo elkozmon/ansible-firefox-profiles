@@ -28,7 +28,7 @@ DOCUMENTATION = """
   options:
     _terms:
       Name(s) of profile(s) to look up.
-    on_missing
+    on_missing:
       description:
         - Action to take if a profile doesn't exist.
       default: error
