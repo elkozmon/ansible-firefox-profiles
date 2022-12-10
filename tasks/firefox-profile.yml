@@ -23,6 +23,22 @@
 #   register: profile_status
 #   when:
 #     - profile_state == "absent"
+#
+# The manual way to do this would be to tweak the profiles.ini file:
+# delete (or comment out) the entire stanza with the profile, and
+# recursively delete its directory.
+#
+# - If deleting the default profile, pick a different one to be the default.
+#   - If there are no other profiles, throw an error.
+#   - Set "Default=1" on some other profile. Maybe the first one that isn't
+#     the current one.
+#   - Set "Default=<new default profile id>" on [InstallNNN], if it exists.
+#     - Also make this change in installs.ini: that's a backup of the
+#       Install section:
+#       https://support.mozilla.org/en-US/kb/understanding-depth-profile-installation
+# - Get the profile directory.
+# - Delete the stanza
+# - If desired, delete the profile directory.
 
 # XXX - It would be nice to do this some way other than grep, for
 # portability to non-Unix OSes (*cough*Windows*cough*), but I don't
