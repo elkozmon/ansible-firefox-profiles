@@ -5,7 +5,7 @@ __metaclass__ = type
 # XXX - Not sure why this requires the "plugin_type" entry. Other
 # lookup plugins don't have it.
 DOCUMENTATION = """
-  name: default_profile
+  name: firefox_default_profile
   author: Andrew Arensburger (arensb@ooblick.com)
   version_added: "2.9.6"
   short_description: Get the default Firefox profile
