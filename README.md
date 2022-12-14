@@ -15,14 +15,6 @@ This role will try to install the following prerequisite packages:
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-| Variable | Required | Default         | Choices | Comments                       |
-|----------|----------|-----------------|---------|--------------------------------|
-| profile  | no       | default profile | string  | Name of profile to operate on  |
-| addons   | no       | none            | list    | List of addon slugs to install |
-| prefs    | no       | none            | dict    | Dictionary                                |
-
 `profile`
 : string, optional. By default, this role will look up the name of the
 default Firefox role. If provided, it should be the short name of the
