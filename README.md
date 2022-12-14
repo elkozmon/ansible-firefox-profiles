@@ -6,7 +6,7 @@ Create and configure Firefox roles.
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role will try to install the following prerequisite packages:
 
 - `jmespath` package (for parsing json):
   `python3-jmespath` in apt, or `py-jmespath` in Macports.
@@ -17,45 +17,107 @@ Role Variables
 
 A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
 
-Dependencies
-------------
+| Variable | Required | Default         | Choices | Comments                       |
+|----------|----------|-----------------|---------|--------------------------------|
+| profile  | no       | default profile | string  | Name of profile to operate on  |
+| addons   | no       | none            | list    | List of addon slugs to install |
+| prefs    | no       | none            | dict    | Dictionary                                |
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+`profile`
+: string, optional. By default, this role will look up the name of the
+default Firefox role. If provided, it should be the short name of the
+profile as given in [about:profiles](about:profiles).
 
-- jmespath package
-  In apt, install `python3-jmespath`.
-  In MacPorts, install `py-jmespath`.
-- Mozilla CA bundle
-  In apt, install `ca-certificates` (I think).
-  On MacPorts, install `py-certifi`.
+`addons`
+: list of strings, optional. This is the list of
+[addons](about:addons) to install. Use each addon's slug, not its
+name. The easiest way to get the slug is from the URL of the Mozilla
+page: if the URL is
+
+    https://addons.mozilla.org/en-US/firefox/addon/privacy-badger17/
+
+then the slug is `privacy-badger17`.
+
+Themes are addons just like extensions. You can list them all in the
+`addons` variable.
+
+`prefs`
+: dictionary, optional. This is the set of preferences to set. These can
+be found in [about:config](about:config).
+
+**Caveats**: For boolean values, don't use YAML
+`true`/`false`/`yes`/`no`: the value must be a string, e.g.:
+
+    network.proxy.share_proxy_settings: "true"
+
+Furthermore, when the value is a string, the quotation marks _must_
+also be quoted, e.g.:
+
+    network.proxy.http: '"localhost"'
+
+To delete a preference entirely, and effetively reset its value to
+Firefox's default, set it to `null`:
+
+    network.proxy.type: null
+
+`security_devices`: list of dictionaries, optional. In
+[Security > Privacy & Security](about:preferences#privacy), you can
+set up Security Devices like hardware keys. This variable allows you
+to do so in Ansible, e.g.:
+
+    security_devices:
+      - name: OpenSC PKCS#11 Module
+        lib: /usr/local/lib/opensc-pkcs11.so
+
+`firefox_cmd`:
+: string, optional. The command to execute to run
+Firefox. Default: `firefox`.
+
+`firefox_dir`
+: string, optional. The directory containing the root of Firefox's
+preferences (the directory containing `profiles.ini`). Default:
+`$HOME/.mozilla/firefox` on Linux. On a Mac, set this to
+`$HOME/Library/Application Support/Firefox`.
+
+`firefox_profile_path`
+: string, optional. The path to the `profiles.ini` file to use.
+Default: `{{ firefox_dir }}/profiles.ini`.
+
+`firefox_owner`, `firefox_group`
+: strings, optional. The user and group who should own `firefox_dir`.
+Default to `ansible_user_id` and `ansible_effective_group_id`.
 
 Example Playbook
 ----------------
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
+    - name: Customize default profile
+      hosts: desktops
       roles:
-         - { role: username.rolename, x: 42 }
-		 
-    - hosts: desktops
+        # No 'profile' specified: use the default profile
+        - role: firefox
+          addons:
+            - password-manager
+
+    - name: More complete customization
+      hosts: desktops
 	  roles:
-	    - role: firefox
-		  vars:
-		    profile: work
-		    addons:
-		      - switchyomega
-		      - password-manager
-		      # Theme:
-		      - solarize-fox
-		    security_devices:
-		      - name: 2FA Dongle
-		        lib: /usr/local/lib/opensc-pkcs15.so
-			prefs:
-			  extensions.privatebrowsing.notification: "true"
-			  # Note the doubly-nested quotes. Necessary for string values.
-			  network.proxy.ftp: '"localhost"'
-			  network.proxy.ftp_port: 12345
+        - role: firefox
+          profile: work
+          addons:
+            - switchyomega
+            - password-manager
+            # Theme:
+            - solarize-fox
+          security_devices:
+            - name: 2FA Dongle
+              lib: /usr/local/lib/opensc-pkcs15.so
+          prefs:
+            extensions.privatebrowsing.notification: "true"
+            # Note the doubly-nested quotes. Necessary for string values.
+            network.proxy.ftp: '"localhost"'
+            network.proxy.ftp_port: 12345
 License
 -------
 
@@ -64,4 +126,4 @@ BSD
 Author Information
 ------------------
 
-Andrew Arensburger, 2020.
+Andrew Arensburger, 2020-2022.

@@ -1,7 +1,7 @@
 ---
 # Create a Firefox profile
 
-- name: "Profile {{ profile }}: Create Firefox profile directory"
+- name: "Profile {{ profile }}: Create Firefox configuration directory"
   file:
     path: "{{ firefox_dir }}"
     state: directory
@@ -23,32 +23,26 @@
 #   register: profile_status
 #   when:
 #     - profile_state == "absent"
-
-# XXX - It would be nice to do this some way other than grep, for
-# portability to non-Unix OSes (*cough*Windows*cough*), but I don't
-# know of one.
-
-# XXX - profile.ini has a set of sections named Profile0, Profile1, etc.
-# Iterate over these with a for-loop. In each one, Look up "Name".
-#   If Name equals {{ profile }}, save to register profile.
-# Finally, if profile register is unset, the profile doesn't exist.
-
-- name: "Profile {{ profile }}: Get profile directory"
-  block:
-    - name: Look for an existing subdirectory
-      find:
-        paths:
-          - "{{ firefox_dir }}"
-          - "{{ firefox_dir }}/Profiles"	# MacOS
-        patterns: ".*\\.{{ profile }}(-[0-9]+)?$"
-        use_regex: yes
-        file_type: directory
-        recurse: no
-      register: find_profiles
-      failed_when: no
-      changed_when: find_profiles.matched != 1
+#
+# The manual way to do this would be to tweak the profiles.ini file:
+# delete (or comment out) the entire stanza with the profile, and
+# recursively delete its directory.
+#
+# - If deleting the default profile, pick a different one to be the default.
+#   - If there are no other profiles, throw an error.
+#   - Set "Default=1" on some other profile. Maybe the first one that isn't
+#     the current one.
+#   - Set "Default=<new default profile id>" on [InstallNNN], if it exists.
+#     - Also make this change in installs.ini: that's a backup of the
+#       Install section:
+#       https://support.mozilla.org/en-US/kb/understanding-depth-profile-installation
+# - Get the profile directory.
+# - Delete the stanza
+# - If desired, delete the profile directory.
 
 - name: "Create profile {{ profile }}"
+  vars:
+    profile_info: "{{ lookup('firefox_profile', profile) }}"
   block:
     - name: "Tell Firefox to create profile {{ profile }}"
       command:
@@ -58,66 +52,22 @@
           - "-no-remote"
           - "-CreateProfile"
           - "{{ profile }}"
-      when: find_profiles is changed
-      register: profile_status
-    - name: "Get profile.ini entry"
-      command:
-        argv:
-          - egrep
-          - '^Path=.*\.{{ profile }}(-[0-9]+)?$'
-          - "{{ firefox_profile_path }}"
-      register: profile_grep
-      check_mode: no
-      changed_when: no
-      failed_when: no
-    - name: "Check that profile was created correctly"
-      vars:
-        lines: >-
-          {{
-            profile_grep.stdout_lines |
-            default(
-              [ profile, 'dummy' ] if ansible_check_mode
-              else [ 'dummy' ]
-            )
-          }}
-        path: >-
-          {{
-              lines[0] | default("") |
-                regex_replace('^Path=', '')
-          }}
-      file:
-        path: "{{ path }}"
-        state: directory
-      register: profile_dir_stat
-      changed_when: no
-      failed_when:
-        - not ansible_check_mode
-        - profile_dir_stat is changed
-    - name: "Get profile subdirectory"
-      vars:
-        lines: >-
-          {{
-            profile_grep.stdout_lines +
-            ([ profile ] if ansible_check_mode else []) +
-            [ 'dummy' ]
-          }}
-      set_fact:
-        profile_dir: >-
-          {{
-            lines[0] |
-            regex_replace('^Path=', '')
-          }}
+      when: profile_info == ""
 
 # Install addons (and themes)
 - name: "Profile {{ profile }}: Install addons"
+  vars:
+    profile_subdir: "{{ firefox_dir }}/{{ lookup('firefox_profile', profile)['path'] | default('abcd1234.'+profile) }}"
   include_tasks: firefox-addon.yml
   with_items: "{{ addons }}"
   loop_control:
     loop_var: addon_slug
 
 - name: "Profile {{ profile }}: Tweak preferences"
+  vars:
+    profile_subdir: "{{ firefox_dir }}/{{ lookup('firefox_profile', profile)['path'] | default('dummy') }}"
   lineinfile:
-    path: "{{ firefox_dir }}/{{ profile_dir }}/prefs.js"
+    path: "{{ profile_subdir }}/prefs.js"
     regexp: '^user_pref\(\"{{ item }}\",.*'
     line: 'user_pref("{{ item }}", {{ prefs[item] }});'
     create: yes

@@ -2,20 +2,6 @@
 # Parameters:
 # - addon_slug: "slug" for the addon to install, e.g., "adblock-plus".
 
-# Require jmespath for json_query to work.
-# In macports, install 'py-jmespath'
-- name: Install jmespath (package)
-  package:
-    name: python3-jmespath
-  when:
-    - ansible_pkg_mgr == "apt"
-- name: Install jmespath (macports)
-  macports:
-    name: py-jmespath
-    state: present
-  when:
-    - ansible_system == "Darwin"
-
 # See also
 # https://stackoverflow.com/questions/37728865/install-webextensions-on-firefox-from-the-command-line
 #	slug=adblock-plus
@@ -39,7 +25,7 @@
 #   $HOME/Library/Application Support/Firefox/Profiles/<profile-dir>/extensions
 - name: "Profile {{ profile }}: addon {{ addon_slug }}: Create extension directory"
   file:
-    path: "{{ firefox_dir }}/{{ profile_dir }}/extensions"
+    path: "{{ profile_subdir }}/extensions"
     state: directory
     owner: "{{ firefox_owner | default(ansible_user_id)}}"
     group: "{{ firefox_group | default(ansible_effective_group_id)}}"
@@ -55,8 +41,8 @@
     basename: "{{ guid }}.xpi"
   uri:
     url: "{{ item.url }}"
-    dest: "{{ firefox_dir }}/{{ profile_dir }}/extensions/{{ basename }}"
-    creates: "{{ firefox_dir }}/{{ profile_dir }}/extensions/{{ basename }}"
+    dest: "{{ profile_subdir }}/extensions/{{ basename }}"
+    creates: "{{ profile_subdir }}/extensions/{{ basename }}"
     owner: "{{ firefox_owner | default(ansible_user_id)}}"
     group: "{{ firefox_group | default(ansible_effective_group_id)}}"
     mode: '0644'

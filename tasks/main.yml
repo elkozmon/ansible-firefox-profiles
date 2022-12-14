@@ -1,8 +1,11 @@
 ---
 # Prerequisite packages
 - include_tasks: packages-macports.yml
-  when:
-    - ansible_pkg_mgr == "macports"
 
 # tasks file for roles/firefox
 - include_tasks: firefox-profile.yml
+  # XXX - Could allow the caller to omit 'profile':
+  #     vars:
+  #       profile2: "{{ profile | default(lookup('firefox_default_profile')) }}"
+  # But this involves retooling firefox-profile.yml to use the new
+  # variable name.

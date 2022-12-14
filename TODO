@@ -1,0 +1,63 @@
+#						-*- Org -*-
+
+* TODO Default profiles.ini
+Default location of ~profiles.ini~ varies by operating system.
+- Unix/Linux: ~/.mozilla/firefox/profiles.ini
+- MacOS: ~/Library/Application Support/Firefox/profiles.ini
+
+* DONE Look up profile directory
+CLOSED: [2022-12-14 Wed 15:39]
+There's a [[https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ini_lookup.html][lookup plugin for .ini files]]. Should be possible to use that to read the ~profiles.ini~ file and get the actual directory used for a given profile, and not guess it.
+
+Profiles are of the form:
+#+begin_src conf
+[Profile6]
+Name=NCBI4
+IsRelative=1
+Path=ccb0rcrm.NCBI4
+#+end_src
+
+So to look up a profile by name (here, "NCBI4"), need to find the section that contains "Name=NCBI4". If that's not possible, might need to iterate over all sections.
+
+Doesn't look as though there's a way to do this kind of search. However, the sections are of the form "Profile<n>". And apparently Firefox keeps removes gaps, so that if there are N profiles, they will be =Profile0= through =ProfileN=. So in principle, we can set up a for loop:
+
+https://docs.ansible.com/ansible/2.4/playbooks_loops.html#looping-over-integer-sequences
+
+Search =Profile0=, =Profile1=, ... =ProfileN= until the desired section doesn't exist.
+
+* DONE Addons
+CLOSED: [2022-12-14 Wed 15:39]
+It might not be possible to install addons just by dumping an xpi file in a directory somewhere. It might be necessary to create a =policies.json= file that says to download and update certain extensions.
+
+Or maybe it /is/ possible:
+https://support.mozilla.org/en-US/kb/deploying-firefox-with-extensions
+says to dump the XPI files in a directory.
+
+So maybe it's just that unknown or unsigned extensions won't be allowed, which doesn't concern us.
+
+See
+https://extensionworkshop.com/documentation/publish/distribute-sideloading/#standard-extension-folders
+
+* DONE Themes
+CLOSED: [2022-12-14 Wed 15:39]
+They're documented in =extensions.json=. Apparently they're considered addons just like plugins.
+
+=green-abstract= is in
+: ~/.mozilla/firefox/gbg4mnfw.carrot/extensions/{ce743293-2169-47f3-bccf-dc42e2121e0a}.xpi
+
+* TODO Delete profiles
+It would be nice to delete profiles as well as create them:
+: firefox -no-remote -DeleteProfile <profile>
+
+But on MacOS, this fails when Firefox is already running.
+
+* TODO Fill out README.md
+
+* TODO Upload to ansible-galaxy
+
+* TODO Support for snap version
+Make this an option: while installing Firefox as a snap is the default, it's not required.
+
+Maybe run
+: snap info firefox
+and see if it returns 0

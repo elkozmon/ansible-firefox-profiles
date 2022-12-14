@@ -1,8 +1,23 @@
+# XXX - Rename this file to just "packages.yaml", including in main.yml.
 ---
-# XXX - Right now, I'm running this as myself, not as ansible, but
-# without a sudo password, so Ansible can't sudo and install these
-# files. Comment out this play until this is resolved.
-# - name: Install Mozilla CA bundle
-#   become: yes
-#   macports:
-#     name: py-certifi
+# Install prerequisites
+
+- name: Install prerequisites (apt)
+  become: yes
+  macports:
+    name: "{{ item }}"
+  with_items:
+    - python3-jmespath
+  when:
+    - ansible_pkg_mgr == "apt"
+
+- name: Install prerequisites (Macports)
+  become: yes
+  macports:
+    name: "{{ item }}"
+  with_items:
+    # Needed to make Python curl work.
+    - py-certifi
+    - py-jmespath
+  when:
+    - ansible_pkg_mgr == "macports"
