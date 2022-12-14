@@ -25,7 +25,7 @@
 #   $HOME/Library/Application Support/Firefox/Profiles/<profile-dir>/extensions
 - name: "Profile {{ profile }}: addon {{ addon_slug }}: Create extension directory"
   file:
-    path: "{{ firefox_dir }}/{{ profile_dir }}/extensions"
+    path: "{{ profile_subdir }}/extensions"
     state: directory
     owner: "{{ firefox_owner | default(ansible_user_id)}}"
     group: "{{ firefox_group | default(ansible_effective_group_id)}}"
@@ -41,8 +41,8 @@
     basename: "{{ guid }}.xpi"
   uri:
     url: "{{ item.url }}"
-    dest: "{{ firefox_dir }}/{{ profile_dir }}/extensions/{{ basename }}"
-    creates: "{{ firefox_dir }}/{{ profile_dir }}/extensions/{{ basename }}"
+    dest: "{{ profile_subdir }}/extensions/{{ basename }}"
+    creates: "{{ profile_subdir }}/extensions/{{ basename }}"
     owner: "{{ firefox_owner | default(ansible_user_id)}}"
     group: "{{ firefox_group | default(ansible_effective_group_id)}}"
     mode: '0644'
