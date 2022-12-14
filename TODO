@@ -51,3 +51,10 @@ But on MacOS, this fails when Firefox is already running.
 * TODO Fill out README.md
 
 * TODO Upload to ansible-galaxy
+
+* TODO Support for snap version
+Make this an option: while installing Firefox as a snap is the default, it's not required.
+
+Maybe run
+: snap info firefox
+and see if it returns 0
