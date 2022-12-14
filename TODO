@@ -5,7 +5,8 @@ Default location of ~profiles.ini~ varies by operating system.
 - Unix/Linux: ~/.mozilla/firefox/profiles.ini
 - MacOS: ~/Library/Application Support/Firefox/profiles.ini
 
-* TODO Look up profile directory
+* DONE Look up profile directory
+CLOSED: [2022-12-14 Wed 15:39]
 There's a [[https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ini_lookup.html][lookup plugin for .ini files]]. Should be possible to use that to read the ~profiles.ini~ file and get the actual directory used for a given profile, and not guess it.
 
 Profiles are of the form:
@@ -24,7 +25,8 @@ https://docs.ansible.com/ansible/2.4/playbooks_loops.html#looping-over-integer-s
 
 Search =Profile0=, =Profile1=, ... =ProfileN= until the desired section doesn't exist.
 
-* Addons
+* DONE Addons
+CLOSED: [2022-12-14 Wed 15:39]
 It might not be possible to install addons just by dumping an xpi file in a directory somewhere. It might be necessary to create a =policies.json= file that says to download and update certain extensions.
 
 Or maybe it /is/ possible:
@@ -36,7 +38,8 @@ So maybe it's just that unknown or unsigned extensions won't be allowed, which d
 See
 https://extensionworkshop.com/documentation/publish/distribute-sideloading/#standard-extension-folders
 
-* Themes
+* DONE Themes
+CLOSED: [2022-12-14 Wed 15:39]
 They're documented in =extensions.json=. Apparently they're considered addons just like plugins.
 
 =green-abstract= is in
