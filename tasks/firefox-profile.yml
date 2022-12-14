@@ -1,7 +1,7 @@
 ---
 # Create a Firefox profile
 
-- name: "Profile {{ profile }}: Create Firefox profile directory"
+- name: "Profile {{ profile }}: Create Firefox configuration directory"
   file:
     path: "{{ firefox_dir }}"
     state: directory
