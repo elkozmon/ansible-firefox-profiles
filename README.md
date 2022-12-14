@@ -34,28 +34,32 @@ Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
+    - name: Customize default profile
+      hosts: desktops
       roles:
-         - { role: username.rolename, x: 42 }
-		 
-    - hosts: desktops
+        # No 'profile' specified: use the default profile
+        - role: firefox
+          addons:
+            - password-manager
+
+    - name: More complete customization
+      hosts: desktops
 	  roles:
-	    - role: firefox
-		  vars:
-		    profile: work
-		    addons:
-		      - switchyomega
-		      - password-manager
-		      # Theme:
-		      - solarize-fox
-		    security_devices:
-		      - name: 2FA Dongle
-		        lib: /usr/local/lib/opensc-pkcs15.so
-			prefs:
-			  extensions.privatebrowsing.notification: "true"
-			  # Note the doubly-nested quotes. Necessary for string values.
-			  network.proxy.ftp: '"localhost"'
-			  network.proxy.ftp_port: 12345
+        - role: firefox
+          profile: work
+          addons:
+            - switchyomega
+            - password-manager
+            # Theme:
+            - solarize-fox
+          security_devices:
+            - name: 2FA Dongle
+              lib: /usr/local/lib/opensc-pkcs15.so
+          prefs:
+            extensions.privatebrowsing.notification: "true"
+            # Note the doubly-nested quotes. Necessary for string values.
+            network.proxy.ftp: '"localhost"'
+            network.proxy.ftp_port: 12345
 License
 -------
 
@@ -64,4 +68,4 @@ BSD
 Author Information
 ------------------
 
-Andrew Arensburger, 2020.
+Andrew Arensburger, 2020-2022.
