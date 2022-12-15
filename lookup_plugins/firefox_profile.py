@@ -1,3 +1,9 @@
+"""Look up Firefox profiles.
+
+Given a Firefox profile name, look up its information in 'profiles.ini'.
+This is a helper plugin for the 'firefox' Ansible role.
+"""
+
 # python 3 headers. Required if submitting to Ansible.
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -71,9 +77,7 @@ display = Display()
 
 
 class LookupModule(LookupBase):
-    """
-    Firefox profile lookup.
-    """
+    """Firefox profile lookup."""
 
     # Get the default path to profiles.ini
     # XXX - This is the same code as in firefox_default_profile.
@@ -91,10 +95,11 @@ class LookupModule(LookupBase):
         "/.mozilla/firefox/profiles.ini"
 
     def run(self, terms, variables=None, **kwargs):
-        """
-            :arg terms: profile(s) to look up
-            :returns: a list of strings, the directories where the profiles
-                named in 'terms' are stored.
+        """Look up profile information.
+
+        :arg terms: profile(s) to look up
+        :returns: a list of strings, the directories where the profiles
+            named in 'terms' are stored.
         """
         # Read the profiles.ini file
         profiles = configparser.ConfigParser()
