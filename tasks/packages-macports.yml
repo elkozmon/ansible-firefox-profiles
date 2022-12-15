@@ -4,7 +4,7 @@
 
 - name: Install prerequisites (apt)
   become: yes
-  macports:
+  package:
     name: "{{ item }}"
   with_items:
     - python3-jmespath
