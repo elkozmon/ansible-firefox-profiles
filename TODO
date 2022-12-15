@@ -5,6 +5,20 @@ Default location of ~profiles.ini~ varies by operating system.
 - Unix/Linux: ~/.mozilla/firefox/profiles.ini
 - MacOS: ~/Library/Application Support/Firefox/profiles.ini
 
+https://stackoverflow.com/a/54358283/5753146
+suggests using
+#+begin_src yaml
+  my_role_variable_default: "global default"
+  my_role_variable_redhat: "redhat specific default"
+  my_role_variable: "{{ lookup('vars', 'my_role_variable_'+ansible_os_family|lower, default=my_role_variable_default) }}"
+#+end_src
+
+Another suggests
+#+begin_src yaml
+  - name: Gather OS family variables
+    include_vars: "{{ (override_os_family is defined) | ternary(override_os_family,ansible_os_family) | lower }}.yml"
+#+end_src
+
 * DONE Look up profile directory
 CLOSED: [2022-12-14 Wed 15:39]
 There's a [[https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ini_lookup.html][lookup plugin for .ini files]]. Should be possible to use that to read the ~profiles.ini~ file and get the actual directory used for a given profile, and not guess it.
@@ -51,7 +65,12 @@ It would be nice to delete profiles as well as create them:
 
 But on MacOS, this fails when Firefox is already running.
 
-* TODO Fill out README.md
+Would it work with ~-new-instance~ ?
+
+Also maybe ~-headless~, especially on remote host.
+
+* DONE Fill out README.md
+CLOSED: [2022-12-15 Thu 08:49]
 
 * TODO Upload to ansible-galaxy
 
@@ -61,3 +80,5 @@ Make this an option: while installing Firefox as a snap is the default, it's not
 Maybe run
 : snap info firefox
 and see if it returns 0
+* TODO Can't create first profile
+When there aren't any profiles, this role fails to find the default. So it fails even if the user asked to create a new one.
