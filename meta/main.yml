@@ -1,5 +1,6 @@
 galaxy_info:
   author: Andrew Arensburger
+  role_name: firefox-profile
   description: Create and customize Firefox profiles.
   company: ooblick.com
 
