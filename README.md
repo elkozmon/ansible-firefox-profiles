@@ -61,7 +61,7 @@ to do so in Ansible, e.g.:
       - name: OpenSC PKCS#11 Module
         lib: /usr/local/lib/opensc-pkcs11.so
 
-`firefox_cmd`:
+`firefox_cmd`
 : string, optional. The command to execute to run
 Firefox. Default: `firefox`.
 
