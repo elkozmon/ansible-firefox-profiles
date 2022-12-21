@@ -9,7 +9,7 @@
   vars:
     profile_subdir: "{{ firefox_dir }}/{{ lookup('firefox_profile', profile)['path'] | default('dummy') }}"
   blockinfile:
-    path: "{{ firefox_sub }}/pkcs11.txt"
+    path: "{{ firefox_subdir }}/pkcs11.txt"
     block: |
       name={{ security_device.name }}
       library={{ security_device.lib }}
