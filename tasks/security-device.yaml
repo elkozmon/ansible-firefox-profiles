@@ -6,8 +6,10 @@
 #	/usr/lib/libfoo.so
 
 - name: "Security device {{ security_device.name }}"
+  vars:
+    profile_subdir: "{{ firefox_dir }}/{{ lookup('firefox_profile', profile)['path'] | default('dummy') }}"
   blockinfile:
-    path: "{{ firefox_dir }}/{{ profile_dir }}/pkcs11.txt"
+    path: "{{ firefox_sub }}/pkcs11.txt"
     block: |
       name={{ security_device.name }}
       library={{ security_device.lib }}
