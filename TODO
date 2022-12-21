@@ -72,7 +72,8 @@ Also maybe ~-headless~, especially on remote host.
 * DONE Fill out README.md
 CLOSED: [2022-12-15 Thu 08:49]
 
-* TODO Upload to ansible-galaxy
+* DONE Upload to ansible-galaxy
+CLOSED: [2022-12-15 Thu 15:53]
 
 * TODO Support for snap version
 Make this an option: while installing Firefox as a snap is the default, it's not required.
