@@ -17,7 +17,10 @@
     name: "{{ item }}"
   with_items:
     # Needed to make Python curl work.
-    - py-certifi
+    #
+    # curl-ca-bundle includes a certificate chain to authenticate
+    # mozilla URLs.
+    - curl-ca-bundle
     - py-jmespath
   when:
     - ansible_pkg_mgr == "macports"
