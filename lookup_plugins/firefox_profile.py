@@ -4,6 +4,30 @@ Given a Firefox profile name, look up its information in 'profiles.ini'.
 This is a helper plugin for the 'firefox' Ansible role.
 """
 
+# XXX - Lookup plugins run on the control host, not the client. But we
+# need to look up "~user" on the client, so that's not going to work.
+#
+# One way around this is the approach that the 'getent' module takes:
+# run 'getent(params)'; that runs on the client, gathers information,
+# and populates a data structure.
+#
+# In this case, should probably specify a username whose profile.ini to read:
+#       firefox_profile:
+#         user: arnie
+# and that'll create a fact:
+#   firefox_profiles['arnie'][0] {
+#     "path": "/home/arnie/.mozilla/profiles.ini",
+#     "data": ...
+#   }
+#
+# Then a playbook can first run
+#       firefox_profile:
+#         user: arnie
+#       register: arnie_profile
+#
+# Then refer to either 'arnie_profile.data{...}' or
+# 'firefox_profiles[arnie]'.
+
 # python 3 headers. Required if submitting to Ansible.
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -102,14 +126,39 @@ class LookupModule(LookupBase):
             named in 'terms' are stored.
         """
         # Read the profiles.ini file
+        # XXX - Open {{ firefox_profiles_path }}, defaulting to
+        # default_profiles_path if it's not set.
+        display.vv(f"default_profiles_path: {LookupModule.default_profiles_path}")
+        display.vv(f"variables[firefox_profile_path]: {variables['firefox_profile_path']}")
+
+        # display.vv(f"firefox_profile_path: {variables}")
+        # XXX - Entries in variables aren't Jinja-expanded.
+        profiles_path = variables['firefox_profile_path'] \
+            if 'firefox_profile_path' in variables \
+            else LookupModule.default_profiles_path
+        # At this stage, profiles_path might be a Jinja2 template.
+        # Expand it.
+        profiles_path = self._templar.template(profiles_path)
+        display.vv(f"now profiles_path: {profiles_path}")
+
         profiles = configparser.ConfigParser()
         try:
-            with open(LookupModule.default_profiles_path) as inifile:
+            with open(profiles_path) as inifile:
+                display.vvv(f"Opened file {profiles_path} as {inifile}")
                 profiles.read_file(inifile)
                 display.vvvv(f"read file [{profiles}]")
         except AnsibleError as e:
-            display.v(f"Error reading {LookupModule.default_profiles_path}: {e}")
+            display.v(f"Error reading {profiles_path}: {e}")
             raise
+        except FileNotFoundError as e:
+            # XXX - Oh, bleah:
+            # https://docs.ansible.com/ansible/latest/plugins/lookup.html
+            # lookups are run on the local machine (the one running
+            # Ansible), not the client.
+            display.v(f"Bleah: {e}")
+            display.v(e)
+            return None
+        display.v(f"Yay, reading file: {profiles_path}")
 
         # Unfortunately, 'profiles.ini' isn't organized in a friendly
         # way: it's a series of sections of the form
