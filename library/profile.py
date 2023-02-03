@@ -19,10 +19,18 @@ XXX
 from ansible.module_utils.basic import AnsibleModule
 
 def run_module():
-    module_args = dict(
-        user=dict(type='str', required=True),
-        # name=dict(type='str', required=True),
-        # new=dict(type='bool', required=False, default=False),
+    module = AnsibleModule(
+        argument_spec=dict(
+            # User: read this user's profiles.ini file.
+            user=dict(type='str', required=False, default=None),
+            # Path: read this specific profiles.ini file.
+            # Overrides user.
+            path=dict(type='str', required=False, default=None),
+        ),
+        mutually_exclusive=[
+            ('user', 'path'),
+        ],
+        supports_check_mode=True,
     )
 
     result = dict(
@@ -33,12 +41,8 @@ def run_module():
         default_profiles=None,
     )
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True,
-    )
-
     if module.check_mode:
+        result['message'] = "Just checking"
         module.exit_json(**result)
 
     result['original_message'] = module.params['name']
