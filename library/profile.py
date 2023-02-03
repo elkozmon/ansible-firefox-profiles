@@ -9,13 +9,21 @@ XXX: fill in
 '''
 
 EXAMPLES = r'''
-XXX
+- name: "Look up bob's Firefox profiles"
+  profile:
+    user: bob
+
+- name: "Look up a specific profile file"
+  profile:
+    path: "/path/to/profiles.ini"
 '''
 
 RETURN = r'''
 XXX
 '''
 
+import os
+import platform
 from ansible.module_utils.basic import AnsibleModule
 
 def run_module():
@@ -35,14 +43,46 @@ def run_module():
 
     result = dict(
         changed=False,
-        # original_message='',
-        # message='',
         profiles=None,
         default_profiles=None,
+        # XXX - Just for development, I think
+        message = "",
     )
 
+    user = module.params['user']
+    path = module.params['path']
+
+    # Figure out which path to open.
+    #
+    # On most Unix/Linux systems, it's ~/.mozilla/firefox/profiles.ini .
+    #
+    # On MacOS, it's ~/Library/Application
+    # Support/Firefox/profiles.ini (and the profiles themselves are
+    # under ~/Library/Application Support/Firefox/Profiles/).
+    #
+    # On Windows, it's %APPDATA%\Mozilla\Firefox\profiles.ini .
+
+    if user is None:
+        home = "~"
+    else:
+        home = f"~{user}"
+    home = os.path.expanduser(home)
+
+    if path is None:
+        system = platform.system()
+        if system == "Darwin":
+            path = f"{home}/Library/Application Support/Firefox/profiles.ini"
+        else:
+            path = f"{home}/.mozilla/firefox/profiles.ini"
+
+    result['message'] += f"path: {path}\n"
+
+    if os.path.exists(path):
+        result['message'] += "It exists.\n"
+    else:
+        result['message'] += "It doesn't exist.\n"
+
     if module.check_mode:
-        result['message'] = "Just checking"
         module.exit_json(**result)
 
     result['original_message'] = module.params['name']
