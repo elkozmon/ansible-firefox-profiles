@@ -46,7 +46,7 @@ def run_module():
         profiles=None,
         default_profiles=None,
         # XXX - Just for development, I think
-        message = "",
+        message="",
     )
 
     user = module.params['user']
@@ -93,10 +93,11 @@ def run_module():
 
     module.exit_json(**result)
 
+
 def main():
     run_module()
+
 
 # Main
 if __name__ == "__main__":
     main()
-
