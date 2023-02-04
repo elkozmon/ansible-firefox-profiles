@@ -27,7 +27,6 @@ import platform
 # configparser: read .ini files.
 import configparser
 from ansible.module_utils.basic import AnsibleModule
-from ansible.errors import AnsibleError
 
 def run_module():
     module = AnsibleModule(
@@ -93,8 +92,6 @@ def run_module():
     try:
         with open(path) as inifile:
             ini.read_file(inifile)
-    except AnsibleError as e:
-        module.fail_json(msg=f"Error reading {profiles_path}: {e}")
     except FileNotFoundError as e:
         module.fail_json(msg=f"File not found error reading {profiles_path}: {e}")
 
