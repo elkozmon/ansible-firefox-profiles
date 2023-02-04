@@ -44,6 +44,9 @@
           - "{{ profile }}"
       when: profiles.profiles[profile] is not defined
       register: create_profile
+    - name: "Reread profiles.ini"
+      profile:
+      when: create_profile is changed
 
 # Install addons (and themes)
 - name: "Profile {{ profile }}: Install addons"
