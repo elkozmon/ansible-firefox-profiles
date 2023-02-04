@@ -1,6 +1,5 @@
 ---
 # defaults file for roles/firefox
-profile: "{{ lookup('firefox_default_profile') }}"
 addons: []
 security_devices: []
 prefs: {}

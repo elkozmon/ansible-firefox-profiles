@@ -16,6 +16,11 @@
   profile:
   register: profiles
 
+- name: Set default profile
+  set_fact:
+    profile: "{{ profiles.default_profile }}"
+  when: profile is not defined
+
 # tasks file for roles/firefox
 - include_tasks: firefox-profile.yml
   # XXX - Could allow the caller to omit 'profile':
