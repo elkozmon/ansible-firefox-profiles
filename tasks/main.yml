@@ -1,6 +1,6 @@
 ---
 # Prerequisite packages
-- include_tasks: packages-macports.yml
+- include_tasks: packages.yaml
 
 - name: "Profile {{ profile }}: Create Firefox configuration directory"
   file:
