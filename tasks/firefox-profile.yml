@@ -33,8 +33,6 @@
 # - If desired, delete the profile directory.
 
 - name: "Create profile {{ profile }}"
-  vars:
-    profile_info: "{{ lookup('firefox_profile', profile) }}"
   block:
     - name: "Tell Firefox to create profile {{ profile }}"
       command:
@@ -44,12 +42,13 @@
           - "-no-remote"
           - "-CreateProfile"
           - "{{ profile }}"
-      when: profile_info == ""
+      when: profiles.profiles[profile] is not defined
+      register: create_profile
 
 # Install addons (and themes)
 - name: "Profile {{ profile }}: Install addons"
   vars:
-    profile_subdir: "{{ firefox_dir }}/{{ lookup('firefox_profile', profile)['path'] | default('abcd1234.'+profile) }}"
+    profile_subdir: "{{ firefox_dir }}/{{ profiles.profiles[profile].path | default('abcd1234'+profile) }}"
   include_tasks: firefox-addon.yml
   with_items: "{{ addons }}"
   loop_control:
@@ -57,7 +56,7 @@
 
 - name: "Profile {{ profile }}: Tweak preferences"
   vars:
-    profile_subdir: "{{ firefox_dir }}/{{ lookup('firefox_profile', profile)['path'] | default('dummy') }}"
+    profile_subdir: "{{ firefox_dir }}/{{ profiles.profiles[profile].path | default('dummy') }}"
   lineinfile:
     path: "{{ profile_subdir }}/prefs.js"
     regexp: '^user_pref\(\"{{ item }}\",.*'
