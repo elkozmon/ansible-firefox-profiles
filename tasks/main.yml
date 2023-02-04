@@ -2,6 +2,14 @@
 # Prerequisite packages
 - include_tasks: packages-macports.yml
 
+- name: "Profile {{ profile }}: Create Firefox configuration directory"
+  file:
+    path: "{{ firefox_dir }}"
+    state: directory
+    owner: "{{ firefox_owner | default(ansible_user_id)}}"
+    group: "{{ firefox_group | default(ansible_effective_group_id)}}"
+    mode: '0755'
+
 # tasks file for roles/firefox
 - include_tasks: firefox-profile.yml
   # XXX - Could allow the caller to omit 'profile':
