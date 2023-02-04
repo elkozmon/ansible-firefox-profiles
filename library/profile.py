@@ -24,7 +24,10 @@ XXX
 
 import os
 import platform
+# configparser: read .ini files.
+import configparser
 from ansible.module_utils.basic import AnsibleModule
+from ansible.errors import AnsibleError
 
 def run_module():
     module = AnsibleModule(
@@ -41,16 +44,17 @@ def run_module():
         supports_check_mode=True,
     )
 
-    result = dict(
+    retval = dict(
         changed=False,
-        profiles=None,
-        default_profiles=None,
+        profiles={},            # Dict of browser profiles
+        sections={},            # Dict of other sections in the file
+        default_profile=None,
         # XXX - Just for development, I think
         message="",
     )
 
-    user = module.params['user']
-    path = module.params['path']
+    user = module.params['user']        # User whose profiles we're reading
+    path = module.params['path']        # Path to profile file
 
     # Figure out which path to open.
     #
@@ -61,40 +65,92 @@ def run_module():
     # under ~/Library/Application Support/Firefox/Profiles/).
     #
     # On Windows, it's %APPDATA%\Mozilla\Firefox\profiles.ini .
-
-    if user is None:
-        home = "~"
-    else:
-        home = f"~{user}"
-    home = os.path.expanduser(home)
-
     if path is None:
+        # In any case, the profile file will be in someone's home directory.
+        if user is None:
+            home = "~"
+        else:
+            home = f"~{user}"
+        home = os.path.expanduser(home)
+
         system = platform.system()
         if system == "Darwin":
             path = f"{home}/Library/Application Support/Firefox/profiles.ini"
         else:
             path = f"{home}/.mozilla/firefox/profiles.ini"
 
-    result['message'] += f"path: {path}\n"
+    if not os.path.exists(path):
+        # XXX - Behave differently in check mode and real mode?
+        # Shouldn't fail in check mode, even if the file doesn't exist.
+        #
+        # In normal mode, maybe should fail: if the caller doesn't
+        # want it to , they can always use 'failed_when: no'.
+        retval['profiles'] = {}
+        module.exit_json(**retval)
 
-    if os.path.exists(path):
-        result['message'] += "It exists.\n"
-    else:
-        result['message'] += "It doesn't exist.\n"
+    # Read profiles.ini and parse as an ini file.
+    ini = configparser.ConfigParser()
+    try:
+        with open(path) as inifile:
+            ini.read_file(inifile)
+    except AnsibleError as e:
+        module.fail_json(msg=f"Error reading {profiles_path}: {e}")
+    except FileNotFoundError as e:
+        module.fail_json(msg=f"File not found error reading {profiles_path}: {e}")
+
+    # Rewrite config to be more friendly.
+    #
+    # Unfortunately, 'profiles.ini' isn't organized in a friendly
+    # way: it's a series of sections of the form
+    #     [Profile1]
+    #     Name=Surfing
+    #     IsRelative=1
+    #     Path=apaphDab.Surfing
+    #     Default=1
+    #
+    #     [Profile0]
+    #     Name=Projects
+    #     IsRelative=1
+    #     Path=Kijnekfa.Projects
+    # So let's walk the list and parse it into a dict.
+    for section_name in ini.sections():
+        section = {}
+
+        # Collect all the key-value pairs in this section.
+        for opt_name in ini.options(section_name):
+            value = ini.get(section_name, opt_name)
+            section[opt_name] = value
+
+        # Check the section name. It's either "ProfileNNN" (so it's a
+        # profile) or some other section.
+        if section_name.startswith("Profile"):
+            # This is a profile name. It should have a name, and should
+            # be stored under this name.
+            if 'name' not in section:
+                # XXX - Something's wrong
+                module.fail_json(msg=f"Missing Name parameter in section {section_name}\n{retval['message']}")
+
+            retval['profiles'][section['name']] = section
+
+            # If this is the default section, remember this.
+            if 'default' in section and section['default'] == 1:
+                retval['default_profile'] = section['name']
+        else:
+            # This is not a Profile section. Save it under its section
+            # name.
+            retval['sections'][section_name] = section
 
     if module.check_mode:
-        module.exit_json(**result)
+        module.exit_json(**retval)
 
-    result['original_message'] = module.params['name']
-    result['message'] = 'goodbye'
+    # XXX - Not sure what else there is to do in non-check mode.
 
-    if module.params['name'] == "fail me":
-        module.fail_json(msg="You requested failure", **result)
-
-    module.exit_json(**result)
+    module.exit_json(**retval)
 
 
 def main():
+    # Why?
+    """Just a wrapper around run_module()."""
     run_module()
 
 
