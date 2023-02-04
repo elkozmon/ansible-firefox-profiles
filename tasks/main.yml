@@ -1,11 +1,25 @@
 ---
 # Prerequisite packages
-- include_tasks: packages-macports.yml
+- include_tasks: packages.yaml
+
+- name: "Profile {{ profile }}: Create Firefox configuration directory"
+  file:
+    path: "{{ firefox_dir }}"
+    state: directory
+    owner: "{{ firefox_owner | default(ansible_user_id)}}"
+    group: "{{ firefox_group | default(ansible_effective_group_id)}}"
+    mode: '0755'
+
+# The 'profile' plugin reads and parses the 'profiles.ini' file, for
+# later reference.
+- name: "Look up user's profiles"
+  profile:
+  register: profiles
+
+- name: Set default profile
+  set_fact:
+    profile: "{{ profiles.default_profile }}"
+  when: profile is not defined
 
 # tasks file for roles/firefox
 - include_tasks: firefox-profile.yml
-  # XXX - Could allow the caller to omit 'profile':
-  #     vars:
-  #       profile2: "{{ profile | default(lookup('firefox_default_profile')) }}"
-  # But this involves retooling firefox-profile.yml to use the new
-  # variable name.

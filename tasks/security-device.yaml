@@ -7,7 +7,7 @@
 
 - name: "Security device {{ security_device.name }}"
   vars:
-    profile_subdir: "{{ firefox_dir }}/{{ lookup('firefox_profile', profile)['path'] | default('dummy') }}"
+    profile_subdir: "{{ firefox_dir }}/{{ profiles.profiles[profile].path | default('dummy') }}"
   blockinfile:
     path: "{{ profile_subdir }}/pkcs11.txt"
     block: |
