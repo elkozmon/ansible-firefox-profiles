@@ -51,6 +51,8 @@
 # Install addons (and themes)
 - name: "Profile {{ profile }}: Install addons"
   vars:
+    # XXX - 'path' is relative to profile_dir only if also 'isrelative=1'.
+    # If 'isrelative=0', then 'path' is an absolute path.
     profile_subdir: "{{ firefox_dir }}/{{ profiles.profiles[profile].path | default('abcd1234'+profile) }}"
   include_tasks: firefox-addon.yml
   with_items: "{{ addons }}"

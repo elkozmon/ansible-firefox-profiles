@@ -130,6 +130,19 @@ def run_module():
             retval['profiles'][section['name']] = section
 
             # If this is the default section, remember this.
+
+            # XXX - On MacOS, no section has "Default=1". Rather,
+            # section "InstallNNNNN" has "Default=Profiles/<path>"
+            # which corresponds to the "Path=" entry of one of the
+            # "Profile" sections.
+            # Ditto on cantaloupe; and vimes has both.
+            #
+            # Only the first behavior is described at
+            # http://kb.mozillazine.org/Profiles.ini_file.
+            # (That hasn't been updated since 2017.)
+            #
+            # See also
+            # https://support.mozilla.org/en-US/kb/understanding-depth-profile-installation
             if 'default' in section and section['default'] == "1":
                 retval['default_profile'] = section['name']
         else:
