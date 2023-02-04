@@ -130,7 +130,7 @@ def run_module():
             retval['profiles'][section['name']] = section
 
             # If this is the default section, remember this.
-            if 'default' in section and section['default'] == 1:
+            if 'default' in section and section['default'] == "1":
                 retval['default_profile'] = section['name']
         else:
             # This is not a Profile section. Save it under its section
