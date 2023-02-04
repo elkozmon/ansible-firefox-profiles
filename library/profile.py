@@ -5,21 +5,52 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 module: profile
-XXX: fill in
+short_description: Read Firefox's list of profiles.
+notes:
+  -
+options:
+  user:
+    description:
+      - User whose profiles.ini file to parse.
+      - Incompatible with C(path).
+    type: str
+    default: ansible_user
+  path:
+    description:
+      - Absolute path to the profiles.ini file to parse.
+      - Incompatible with C(user).
+    type: str
 '''
 
 EXAMPLES = r'''
+- name: "Look up the default user's Firefox profiles"
+  profile:
+  register: profiles
+
 - name: "Look up bob's Firefox profiles"
   profile:
     user: bob
+  register: bob_profiles
 
 - name: "Look up a specific profile file"
   profile:
     path: "/path/to/profiles.ini"
+  register: specific_profiles
 '''
 
 RETURN = r'''
-XXX
+profiles:
+  description: Dict of profiles in C(profiles.ini), indexed by their profile name.
+  returned: always
+  type: dict
+sectdions:
+  description: Dict of sections in C(profiles.ini) that aren't profiles, indexed by section name.
+  returned: always
+  type: dict
+default_profile:
+  description: Name of the default profile, if any.
+  returned: success, in some cases
+  type: str
 '''
 
 import os
@@ -28,7 +59,9 @@ import platform
 import configparser
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
+    """Run the 'profile' module."""
     module = AnsibleModule(
         argument_spec=dict(
             # User: read this user's profiles.ini file.
@@ -48,8 +81,6 @@ def run_module():
         profiles={},            # Dict of browser profiles
         sections={},            # Dict of other sections in the file
         default_profile=None,
-        # XXX - Just for development, I think
-        message="",
     )
 
     user = module.params['user']        # User whose profiles we're reading
@@ -125,7 +156,7 @@ def run_module():
             # be stored under this name.
             if 'name' not in section:
                 # XXX - Something's wrong
-                module.fail_json(msg=f"Missing Name parameter in section {section_name}\n{retval['message']}")
+                module.fail_json(msg=f"Missing Name parameter in section {section_name}")
 
             retval['profiles'][section['name']] = section
 
