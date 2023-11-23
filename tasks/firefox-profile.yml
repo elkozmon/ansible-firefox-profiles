@@ -46,7 +46,7 @@
       register: create_profile
     - name: "Reread profiles.ini"
       profile:
-      when: create_profile is changed
+      register: profiles
 
 # Install addons (and themes)
 - name: "Profile {{ profile }}: Install addons"
@@ -89,3 +89,14 @@
     - security_devices is defined
     - security_devices != ""
     - security_devices | length > 0
+
+# Install trusted certificates
+- name: Install trusted certificates
+  include_tasks: trusted-certificates.yml
+  with_items: "{{ trusted_certificates }}"
+  loop_control:
+    loop_var: certificate
+  when:
+    - trusted_certificates is defined
+    - trusted_certificates != ""
+    - trusted_certificates | length > 0

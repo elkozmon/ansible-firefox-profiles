@@ -8,6 +8,7 @@
     name: "{{ item }}"
   with_items:
     - python3-jmespath
+    - libnss3-tools
   when:
     - ansible_pkg_mgr == "apt"
 
@@ -22,5 +23,6 @@
     # mozilla URLs.
     - curl-ca-bundle
     - py-jmespath
+    - nss
   when:
     - ansible_pkg_mgr == "macports"
