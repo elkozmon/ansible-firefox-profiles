@@ -8,10 +8,15 @@
 - name: "Certificate {{ certificate.name }}"
   vars:
     profile_subdir: "{{ firefox_dir }}/{{ profiles.profiles[profile].path | default('dummy') }}"
-  ansible.builtin.command: >
-    certutil
-      -A
-      -n "{{ certificate.name }}"
-      -t "{{ certificate.trustargs | d('CT,C,') }}" 
-      -i "{{ certificate.path }}"
-      -d "sql:{{ profile_subdir }}"
+  ansible.builtin.command:
+    argv:
+      - certutil
+      - -A
+      - -n
+      - "{{ certificate.name }}"
+      - -t
+      - "{{ certificate.trustargs | d('CT,C,') }}" 
+      - -i
+      - "{{ certificate.path }}"
+      - -d
+      - "sql:{{ profile_subdir }}"
